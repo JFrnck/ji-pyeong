@@ -4,7 +4,7 @@
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo 'no tests yet — pending phase 2' && exit 0"
   },
   "keywords": [],
   "author": "",

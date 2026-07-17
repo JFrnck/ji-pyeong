@@ -14,9 +14,20 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+  describe('getGreeting', () => {
+    it('devuelve el saludo de ji-pyeong con message y version', () => {
+      const result = appController.getGreeting();
+      expect(result.message).toBe(
+        '¡Hola! Soy ji-pyeong, tu asistente personal. Estoy listo para ayudarte.',
+      );
+      expect(result.version).toBe('0.1.0');
+    });
+  });
+
+  describe('getHealth', () => {
+    it('devuelve status ok', () => {
+      const result = appController.getHealth();
+      expect(result.status).toBe('ok');
     });
   });
 });

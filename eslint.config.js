@@ -7,6 +7,12 @@ export default tseslint.config(
   ...tseslint.configs.strict,
   eslintConfigPrettier,
   {
+    languageOptions: {
+      parserOptions: {
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     rules: {
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/explicit-function-return-type": "off"
