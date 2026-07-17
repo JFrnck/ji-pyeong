@@ -67,6 +67,30 @@ Cuatro capas, comunicándose siempre en la dirección declarada:
 - OS: Ubuntu 24.04 LTS.
 - Región: la más cercana a tu ubicación actual con Always Free disponible.
 
+#### 3.1.1 Presupuesto de recursos (obligatorio)
+
+Total disponible tras reservar SO/K3s: **20 GB RAM, 3.5 vCPU**.
+
+| Componente              | Requests (RAM) | Limits (RAM)   | Requests (CPU) | Limits (CPU)    |
+| ----------------------- | -------------- | -------------- | -------------- | --------------- |
+| Postgres (con pgvector) | 4 Gi           | 6 Gi           | 500m           | 1500m           |
+| Redis                   | 512 Mi         | 1 Gi           | 100m           | 500m            |
+| Infisical               | 256 Mi         | 512 Mi         | 50m            | 200m            |
+| ji-pyeong orchestrator  | 512 Mi         | 1 Gi           | 200m           | 800m            |
+| executor                | 256 Mi         | 512 Mi         | 100m           | 400m            |
+| Traefik                 | 128 Mi         | 256 Mi         | 50m            | 200m            |
+| cloudflared             | 64 Mi          | 128 Mi         | 50m            | 100m            |
+| Prometheus              | 512 Mi         | 1 Gi           | 100m           | 300m            |
+| Loki                    | 256 Mi         | 512 Mi         | 100m           | 300m            |
+| Grafana                 | 256 Mi         | 512 Mi         | 50m            | 200m            |
+| cert-manager            | 64 Mi          | 128 Mi         | 50m            | 100m            |
+| Flux                    | 128 Mi         | 256 Mi         | 50m            | 200m            |
+| **agents-sandbox pool** | —              | **6 Gi total** | —              | **1500m total** |
+
+Los pods efímeros consumen del pool `agents-sandbox` mediante ResourceQuota a nivel de namespace, no requests individuales. Esto los aísla naturalmente del resto del clúster.
+
+Ver `AGENTS.md` sección 4.4 para la regla dura de aplicación, y ADR 0002 para el análisis de por qué es obligatorio y no recomendado.
+
 ### 3.2 Runtime
 
 - **K3s** (Rancher's lightweight Kubernetes) como orquestador.

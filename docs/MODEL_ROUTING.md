@@ -217,3 +217,39 @@ Para documentación técnica externa (React, Tailwind, NestJS, Prisma, etc.), NO
 - MCPs oficiales de librerías que los publiquen (ej. Prisma, Anthropic).
 
 El agente hace tool-calling a estos MCPs on-demand cuando necesita documentación fresca. Esto reemplaza completamente el pipeline Jina/Firecrawl del blueprint original.
+
+## 7.1 Contexto de versiones automático (anti-alucinación)
+
+Todo prompt del `ModelProvider` que involucre generar código sobre librerías del stack debe incluir automáticamente las versiones exactas del `package.json` como contexto.
+
+### Implementación
+
+`packages/shared-config/src/versions.ts`:
+
+```typescript
+export async function getInstalledVersions(packageNames: string[]): Promise<Record<string, string>>;
+```
+
+Lee los `package.json` relevantes del monorepo y devuelve un mapa `{ nombre: version }`.
+
+### Uso en el ModelProvider
+
+Antes de cada llamada LLM con tarea de código, el ModelProvider prepend al system prompt:
+
+Estás trabajando con estas versiones exactas del stack:
+
+@nestjs/core: {version}
+react: {version}
+vite: {version}
+@prisma/client: {version}
+zod: {version}
+
+Consulta Context7 MCP con IDs de versión específicos cuando necesites documentación. Si Context7 no tiene información para una versión exacta, avisa explícitamente y no inventes. No uses APIs de versiones anteriores aunque las conozcas; asumí que hubo cambios.
+
+### Razón (ver ADR 0002)
+
+Entre versiones menores de frameworks recientes hubo cambios sutiles de API que los LLMs actuales pueden no conocer bien. Anclar el prompt a versiones exactas + forzar al LLM a consultar Context7 con esas versiones reduce alucinaciones sutiles del tipo "método que existía en v11.0 pero se renombró en v11.1".
+
+### Frecuencia de actualización
+
+Automático — el archivo se lee del disco en cada request. Cuando `pnpm update` cambia una versión, el próximo prompt refleja el cambio sin editar código.
